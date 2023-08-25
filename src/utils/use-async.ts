@@ -31,6 +31,7 @@ export const useAsync = <D>(initialState?: State<D>) => {
             error: error
         })
     }
+    //触发异步请求
     const run = (promise: Promise<D>) => {
         if(!promise || !promise.then) {
             throw new Error('请传入Promise类型数据');
