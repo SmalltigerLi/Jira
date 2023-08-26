@@ -49,6 +49,7 @@ export const useAsync = <D>(initialState?: State<D>, initialConfig?: typeof defa
             //catch会消化异常，如果不抛出外面接收不到异常
             setError(error);
             if(config.throwOnError) return Promise.reject(error);
+            return error;
         }
     }
 

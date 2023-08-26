@@ -1,10 +1,12 @@
-import { FormEvent } from "react";
+
 import { useAuth } from "../context/auth-context";
-import {Form, Input, Button} from 'antd'
+import {Form, Input} from 'antd'
 import { LongButton } from ".";
+import { useAsync } from "../utils/use-async";
 const apiUrl = process.env.REACT_APP_API_URL
 export const RegisterScreen = ({onError}: {onError: (error: Error) => void}) => {
-    const {register, user} = useAuth();
+    const {register} = useAuth();
+    const {run, isLoading} = useAsync(undefined, {throwOnError: true});
     const handleSubmit = ({cpassword, ...values}: {username: string, password: string, cpassword: string}) => {
         // event.preventDefault();
         // const username = (event.currentTarget.elements[0] as HTMLInputElement).value;
@@ -13,7 +15,7 @@ export const RegisterScreen = ({onError}: {onError: (error: Error) => void}) => 
             onError(new Error('请确认两次输入的密码相同'));
             return;
         }
-        register(values);
+        run(register(values)).catch(onError);
     }
     return (
         <Form onFinish={handleSubmit}>
@@ -27,8 +29,8 @@ export const RegisterScreen = ({onError}: {onError: (error: Error) => void}) => 
             <Input placeholder={'确认密码'} type="password" id={'cpassword'}/>
             </Form.Item>
             <Form.Item>
-                <LongButton htmlType={'submit'} type={'primary'}>注册</LongButton>
+                <LongButton loading={isLoading} htmlType={'submit'} type={'primary'}>注册</LongButton>
             </Form.Item>
         </Form>
-    )
+    ) 
 }
