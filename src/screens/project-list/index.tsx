@@ -10,11 +10,7 @@ import { useUrlQueryParam } from "../../utils/url";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 export const ProjectListScreen = () => {
-    const [, setParam] = useState({
-        name: "",
-        personId: "",
-    });
-    const [param] = useUrlQueryParam(['name', 'personId'])
+    const [param, setParam] = useUrlQueryParam(['name', 'personId'])
     const debouncedParam = useDebounce(param, 200);
     const { isLoading, error, data: list } = useProjects(debouncedParam);
     const { data: users } = useUsers();
@@ -39,7 +35,7 @@ export const ProjectListScreen = () => {
         </ScreenContainer>
     );
 };
-ProjectListScreen.whyDidYouRender = true;
+ProjectListScreen.whyDidYouRender = false;
 const ScreenContainer = styled.div`
     padding: 3.2rem;
 `;
