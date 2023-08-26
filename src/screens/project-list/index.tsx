@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { useState } from "react";
-import { useDebounce } from "../../utils";
+import { useDebounce, useDocumentTitle } from "../../utils";
 import { List } from "./list"
 import { SearchPanel } from "./search-panel"
 import { Typography } from 'antd'
@@ -16,7 +16,8 @@ export const ProjectListScreen = () => {
     const debouncedParam = useDebounce(param, 200);
     const {isLoading, error, data: list} = useProjects(debouncedParam);
     const {data: users} = useUsers()
-    
+    useDocumentTitle('项目列表', false);
+
     return (
         <ScreenContainer>
             <h1>项目列表</h1>

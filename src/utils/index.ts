@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const isVoid = (obj: unknown) => obj === undefined || obj === null || obj === '';
 
@@ -27,4 +27,20 @@ export const useDebounce = <T>(value: T, delay?: number): T => {
         return () => clearTimeout(timeout);
     }, [value, delay]);
     return debouncedValue;
+}
+
+export const useDocumentTitle = (title: string, keepOnMount: boolean = true) => {
+    const oldTitle = useRef(document.title).current;
+    
+    useEffect(() => {
+        document.title = title;
+    }, [title]);
+
+    useEffect(() => {
+        return () => {
+            if (!keepOnMount) {
+                document.title = oldTitle;
+            }
+        } 
+    }, []);
 }
