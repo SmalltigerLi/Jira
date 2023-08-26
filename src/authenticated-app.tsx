@@ -18,7 +18,7 @@ export const AuthenticatedApp = () => {
                     <HeaderRight>
                         <Dropdown overlay={<Menu>
                             <Menu.Item key={'logout'}>
-                                <Button type={'link'}>登出</Button>
+                                <Button onClick={logout} type={'link'}>登出</Button>
                             </Menu.Item>
                         </Menu>}>
                             <Button type={'link'} onClick={e => e.preventDefault()}>Hi, {user?.name}</Button>
