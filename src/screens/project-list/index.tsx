@@ -7,14 +7,14 @@ import { Typography } from "antd";
 import { useProjects } from "../../utils/project";
 import { useUsers } from "../../utils/user";
 import { useUrlQueryParam } from "../../utils/url";
+import { useProjectSearchParams } from "./util";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 export const ProjectListScreen = () => {
-    const [param, setParam] = useUrlQueryParam(['name', 'personId'])
-    const debouncedParam = useDebounce(param, 200);
-    const { isLoading, error, data: list } = useProjects(debouncedParam);
-    const { data: users } = useUsers();
     useDocumentTitle("项目列表", false);
+    const [param, setParam] = useProjectSearchParams();
+    const { isLoading, error, data: list } = useProjects(useDebounce(param, 200));
+    const { data: users } = useUsers();
     
     return (
         <ScreenContainer>
@@ -35,7 +35,7 @@ export const ProjectListScreen = () => {
         </ScreenContainer>
     );
 };
-ProjectListScreen.whyDidYouRender = false;
+ProjectListScreen.whyDidYouRender = true;
 const ScreenContainer = styled.div`
     padding: 3.2rem;
 `;
