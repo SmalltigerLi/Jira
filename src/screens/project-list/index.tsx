@@ -6,18 +6,20 @@ import { SearchPanel } from "./search-panel";
 import { Typography } from "antd";
 import { useProjects } from "../../utils/project";
 import { useUsers } from "../../utils/user";
+import { useUrlQueryParam } from "../../utils/url";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 export const ProjectListScreen = () => {
-    const [param, setParam] = useState({
+    const [, setParam] = useState({
         name: "",
         personId: "",
     });
+    const [param] = useUrlQueryParam(['name', 'personId'])
     const debouncedParam = useDebounce(param, 200);
     const { isLoading, error, data: list } = useProjects(debouncedParam);
     const { data: users } = useUsers();
     useDocumentTitle("项目列表", false);
-
+    
     return (
         <ScreenContainer>
             <h1>项目列表</h1>
@@ -37,7 +39,7 @@ export const ProjectListScreen = () => {
         </ScreenContainer>
     );
 };
-
+ProjectListScreen.whyDidYouRender = true;
 const ScreenContainer = styled.div`
     padding: 3.2rem;
 `;
