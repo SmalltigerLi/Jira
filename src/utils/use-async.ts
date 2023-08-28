@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useMountRef } from ".";
 
 interface State<D> {
     error: Error | null;
@@ -15,8 +16,10 @@ const defaultInitialState: State<null> = {
 const defaultConfig = {
     throwOnError: false
 }
+
 export const useAsync = <D>(initialState?: State<D>, initialConfig?: typeof defaultConfig) => {
     const config = {...defaultConfig, initialConfig};
+    const mountedRef = useMountRef();
     const [state, setState] = useState<State<D>>({
         ...defaultInitialState,
         ...initialState
@@ -43,7 +46,9 @@ export const useAsync = <D>(initialState?: State<D>, initialConfig?: typeof defa
         setState({...state, stat: 'loading'});
         try {
             const data = await promise;
-            setData(data);
+            if(mountedRef) {
+                setData(data);
+            }
             return data;
         } catch (error: any) {
             //catch会消化异常，如果不抛出外面接收不到异常
