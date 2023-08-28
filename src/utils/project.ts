@@ -14,7 +14,7 @@ export const useProjects = (param?: Partial<Project>) => {
         run(fetchProjects(), {
             retry: fetchProjects,
         });
-    }, [param, run]);
+    }, [param, run, fetchProjects]);
     return result;
 }
 
