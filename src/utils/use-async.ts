@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useMountRef } from ".";
 
 interface State<D> {
@@ -24,6 +24,7 @@ export const useAsync = <D>(initialState?: State<D>, initialConfig?: typeof defa
         ...defaultInitialState,
         ...initialState
     })
+    const [retry, setRetry] = useState(() => () => {})
     const setData = (data: D) => {
         setState({
             data,
@@ -39,25 +40,33 @@ export const useAsync = <D>(initialState?: State<D>, initialConfig?: typeof defa
         })
     }
     //触发异步请求
-    const run = async (promise: Promise<D>) => {
+    const run = useCallback((promise: Promise<D>,
+        runConfig?: {retry: () => Promise<D>}
+        ) => {
         if(!promise || !promise.then) {
             throw new Error('请传入Promise类型数据');
         }
-        setState({...state, stat: 'loading'});
-        try {
-            const data = await promise;
-            if(mountedRef) {
-                setData(data);
+        setRetry(() => () => {
+            if(runConfig?.retry) {
+                run(runConfig?.retry(), runConfig);
             }
-            return data;
-        } catch (error: any) {
-            //catch会消化异常，如果不抛出外面接收不到异常
-            setError(error);
-            if(config.throwOnError) return Promise.reject(error);
-            return error;
-        }
-    }
-
+        })
+        setState({...state, stat: 'loading'});
+        return promise
+            .then((data: D) => {
+                if(mountedRef) {
+                    setData(data);
+                }
+                return data;
+            })
+            .catch((error) => {
+                //catch会消化异常，如果不抛出外面接收不到异常
+                setError(error);
+                if(config.throwOnError) return Promise.reject(error);
+                return error;
+            })
+    }, [mountedRef, setData, state])
+    
     return {
         isIdle: state.stat === 'idle',
         isLoading: state.stat === 'loading',
@@ -66,6 +75,8 @@ export const useAsync = <D>(initialState?: State<D>, initialConfig?: typeof defa
         setData,
         setError,
         ...state,
-        run
+        run,
+        //调用时重新跑一遍run
+        retry
     }
 }
