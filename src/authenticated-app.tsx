@@ -1,59 +1,75 @@
 import styled from "@emotion/styled";
-import { Row } from "./components/lib";
+import { ButtonNoPadding, Row } from "./components/lib";
 import { useAuth } from "./context/auth-context";
 import { ProjectListScreen } from "./screens/project-list";
 import { ReactComponent as SoftwareLogo } from "./assets/software-logo.svg";
 import { Dropdown, Menu, Button } from "antd";
-import { Route, Routes } from 'react-router'
+import { Route, Routes } from "react-router";
 import { ProjectScreen } from "./screens/project";
 import { BrowserRouter as Router } from "react-router-dom";
 import { resetRoute } from "./utils";
+import { useState } from "react";
+import { ProjectModal } from "./screens/project-list/project-modal";
+import { ProjectPopover } from "./components/project-popover";
 
 export const AuthenticatedApp = () => {
+    const [projectModalOpen, setProjectModalOpen] = useState(false);
     return (
         <div>
             <Container>
-                <PageHeader/>
+                <PageHeader setProjectModalOpen={setProjectModalOpen}/>
                 <Main>
                     <Router>
                         <Routes>
-                            <Route path={'/projects'} element={<ProjectListScreen/>}/>
-                            <Route path={'/projects/:projectId/*'} element={<ProjectScreen/>}/>
-                            <Route index element={<ProjectListScreen/>}/>
+                            <Route
+                                path={"/projects"}
+                                element={<ProjectListScreen setProjectModalOpen={setProjectModalOpen}/>}
+                            />
+                            <Route
+                                path={"/projects/:projectId/*"}
+                                element={<ProjectScreen />}
+                            />
+                            <Route index element={<ProjectListScreen setProjectModalOpen={setProjectModalOpen}/>} />
                         </Routes>
                     </Router>
                 </Main>
+                <ProjectModal projectModalOpen={projectModalOpen} onClose={() => setProjectModalOpen(false)}/>
             </Container>
         </div>
     );
 };
-const PageHeader = () => {
+const User = () => {
     const { logout, user } = useAuth();
+    return (
+        <Dropdown
+            overlay={
+                <Menu>
+                    <Menu.Item key={"logout"}>
+                        <Button onClick={logout} type={"link"}>
+                            登出
+                        </Button>
+                    </Menu.Item>
+                </Menu>
+            }
+        >
+            <Button type={"link"} onClick={(e) => e.preventDefault()}>
+                Hi, {user?.name}
+            </Button>
+        </Dropdown>
+    );
+};
+const PageHeader = (props: {setProjectModalOpen: (isOpen: boolean) => void} ) => {
     return (
         <Header between={true}>
             <HeaderLeft gap={true}>
-                <Button type="link" onClick={resetRoute}>
+                <ButtonNoPadding type="link" onClick={resetRoute}>
                     <SoftwareLogo width={"18rem"} color={"rgb(38, 132, 255)"} />
-                </Button>
-                <h2>项目</h2>
-                <h2>用户</h2>
+                </ButtonNoPadding>
+                <ProjectPopover setProjectModalOpen={props.setProjectModalOpen}/>
+                <span>用户</span>
             </HeaderLeft>
             <HeaderRight>
-                <Dropdown
-                    overlay={
-                        <Menu>
-                            <Menu.Item key={"logout"}>
-                                <Button onClick={logout} type={"link"}>
-                                    登出
-                                </Button>
-                            </Menu.Item>
-                        </Menu>
-                    }
-                >
-                    <Button type={"link"} onClick={(e) => e.preventDefault()}>
-                        Hi, {user?.name}
-                    </Button>
-                </Dropdown>
+                <User />
             </HeaderRight>
         </Header>
     );

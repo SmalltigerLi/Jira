@@ -3,14 +3,14 @@ import { useState } from "react";
 import { useDebounce, useDocumentTitle } from "../../utils";
 import { List } from "./list";
 import { SearchPanel } from "./search-panel";
-import { Typography } from "antd";
+import { Typography, Button } from "antd";
 import { useProjects } from "../../utils/project";
 import { useUsers } from "../../utils/user";
-import { useUrlQueryParam } from "../../utils/url";
 import { useProjectSearchParams } from "./util";
+import { Row } from "../../components/lib";
 
 const apiUrl = process.env.REACT_APP_API_URL;
-export const ProjectListScreen = () => {
+export const ProjectListScreen = (props: {setProjectModalOpen: (isOpen: boolean) => void}) => {
     useDocumentTitle("项目列表", false);
     const [param, setParam] = useProjectSearchParams();
     const { isLoading, error, data: list, retry } = useProjects(useDebounce(param, 200));
@@ -18,7 +18,10 @@ export const ProjectListScreen = () => {
     
     return (
         <ScreenContainer>
-            <h1>项目列表</h1>
+            <Row between={true}>
+                <h1>项目列表</h1>
+                <Button onClick={() => props.setProjectModalOpen(true)}>创建项目</Button>
+            </Row>
             <SearchPanel
                 param={param}
                 setParam={setParam}
@@ -28,6 +31,7 @@ export const ProjectListScreen = () => {
                 <Typography.Text type="danger">{error.message}</Typography.Text>
             ) : null}
             <List
+                setProjectModalOpen={props.setProjectModalOpen}
                 refresh={retry}
                 loading={isLoading}
                 dataSource={list || []}
