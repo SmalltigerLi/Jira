@@ -53,5 +53,5 @@ export const useMountRef = () => {
         ref.current = true;
         return () => {ref.current = false};
     }, []);
-    return ref.current;
+    return ref;
 }
