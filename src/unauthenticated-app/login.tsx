@@ -1,17 +1,20 @@
-import { FormEvent } from "react";
 import { useAuth } from "../context/auth-context";
 import {Form, Input, Typography} from 'antd'
 import { LongButton } from ".";
 import { useAsync } from "../utils/use-async";
+import { useDispatch } from "react-redux";
 export const LoginScreen = ({onError}: {onError: (error: Error) => void}) => {
     const {login} = useAuth();
     const {run, isLoading, error} = useAsync(undefined, {throwOnError: true});
+    const dispatch = useDispatch();
     const handleSubmit = (values: {username: string, password: string, cpassword: string}) => {
         // event.preventDefault();
         // const username = (event.currentTarget.elements[0] as HTMLInputElement).value;
         // const password = (event.currentTarget.elements[1] as HTMLInputElement).value;
+        //dispatch(loginThunk(values));
         run(login(values)).catch(onError);
     }
+
     return (
         <Form onFinish={handleSubmit}>
             {error ? <Typography.Text type={'danger'}>{error.message}</Typography.Text> : null}
